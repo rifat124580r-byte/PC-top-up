@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>XN Temp Mail</title>
+    <meta name="description" content="A premium disposable inbox for short-lived email." />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #eaf7ff;
+        --bg-grad: linear-gradient(145deg, #e6f8ff 0%, #edf2ff 48%, #f5ecff 100%);
+        --surface: rgba(255, 255, 255, 0.72);
+        --panel: rgba(255, 255, 255, 0.55);
+        --border: rgba(255, 255, 255, 0.9);
+        --accent: #219bd4;
+        --accent2: #625be8;
+        --success: #10b981;
+        --danger: #f43f5e;
+        --text: #1e293b;
+        --text-dim: #475569;
+        --text-faint: #94a3b8;
+        --shadow: rgba(44, 134, 207, 0.16);
+        --deep: #143c68;
+        --logo-blue: #28a9e0;
+        --mono: "JetBrains Mono", monospace;
+        --sans: "Plus Jakarta Sans", sans-serif;
+      }
+
+      * { box-sizing: border-box; }
+      html { min-width: 320px; background: var(--bg); }
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        overflow-x: hidden;
+        color: var(--text);
+        font-family: var(--sans);
+        background: var(--bg);
+      }
+      button { font: inherit; }
+      button, [role="button"] { cursor: pointer; }
+      button:focus-visible { outline: 3px solid rgba(91, 124, 250, 0.35); outline-offset: 3px; }
+      .page {
+        position: relative;
+        isolation: isolate;
+        width: 100%;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        padding: 14px;
+        background: var(--bg-grad);
+      }
+      .page::before {
+        position: fixed;
+        z-index: -1;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,.05));
+        content: "";
+      }
+      .blob {
+        position: fixed;
+        z-index: -1;
+        width: 360px;
+        height: 360px;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: .5;
+        pointer-events: none;
+      }
+      .blob-a { top: -110px; left: -90px; background: #78d8f6; animation: float-a 11s ease-in-out infinite alternate; }
+      .blob-b { top: 28%; right: -120px; background: #aaa7ff; animation: float-b 14s ease-in-out infinite alternate; }
+      .blob-c { bottom: -150px; left: 38%; background: #bdeeff; animation: float-c 9s ease-in-out infinite alternate; }
+      @keyframes float-a { to { transform: translate(100px, 100px) scale(1.15); } }
+      @keyframes float-b { to { transform: translate(-90px, 70px) scale(.85); } }
+      @keyframes float-c { to { transform: translate(50px, -100px) scale(1.2); } }
+
+      .shell {
+        width: min(100%, 480px);
+        min-height: calc(100vh - 28px);
+        margin: 0 auto;
+        padding: 18px 16px 26px;
+        border: 1px solid rgba(255,255,255,.92);
+        border-radius: 36px;
+        background: rgba(250,253,255,.36);
+        box-shadow: 0 28px 90px rgba(38,117,182,.16), inset 0 1px 0 rgba(255,255,255,.85);
+        transform: perspective(1400px) rotateX(.6deg);
+        transform-style: preserve-3d;
+      }
+      .topbar { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+      .brand { display: inline-flex; align-items: center; color: var(--deep); text-decoration: none; }
+      .brand-mark {
+        display: grid;
+        width: 48px;
+        height: 48px;
+        place-items: center;
+        overflow: hidden;
+        border: 2px solid rgba(255,255,255,.9);
+        border-radius: 16px;
+        color: white;
+        background: var(--logo-blue);
+        box-shadow: 0 12px 22px rgba(22,142,203,.28), inset 0 1px 0 rgba(255,255,255,.42);
+        transform: perspective(500px) rotateY(-10deg) rotateX(7deg);
+        transform-style: preserve-3d;
+      }
+      .brand-mark img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+       .brand-mark svg { width: 25px; height: 25px; }
+      .brand-copy { display: grid; gap: 4px; margin-left: 10px; }
+      .brand-name { font-size: 14px; font-weight: 800; letter-spacing: -.3px; }
+      .brand-sub { color: var(--text-faint); font: 600 9px/1 var(--mono); letter-spacing: 1.3px; text-transform: uppercase; }
+      .top-actions { display: flex; align-items: center; gap: 16px; }
+      .private-note { display: inline-flex; align-items: center; gap: 7px; color: var(--text-dim); font-size: 11px; font-weight: 600; }
+      .live-dot, .unread-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #55b995; }
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        min-height: 42px;
+        padding: 0 16px;
+        border: 1px solid rgba(255,255,255,.9);
+        border-radius: 12px;
+        color: var(--text-dim);
+        background: rgba(255,255,255,.65);
+        box-shadow: 0 8px 23px rgba(99,102,241,.08);
+        transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+      }
+      .button:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(99,102,241,.14); background: rgba(255,255,255,.86); }
+      .button:active { transform: scale(.94); }
+      .button.primary { color: white; border-color: transparent; background: linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow: 0 13px 24px rgba(33,155,212,.3); }
+      .button.primary:hover { box-shadow: 0 17px 30px rgba(33,155,212,.4); }
+      .button.icon { width: 48px; padding: 0; }
+      .button.small { min-height: 36px; padding: 0 12px; font-size: 11px; }
+      .button svg { width: 16px; height: 16px; flex: 0 0 auto; }
+
+      .intro { display: grid; justify-items: center; gap: 8px; padding: 30px 0 24px; text-align: center; }
+      .eyebrow { display: none; }
+      .eyebrow svg { width: 14px; height: 14px; }
+      .intro::before {
+        display: grid;
+        place-items: center;
+        width: 76px;
+        height: 76px;
+        border: 5px solid rgba(255,255,255,.84);
+        border-radius: 26px;
+         color: white;
+         background: linear-gradient(135deg, #24a7df, #655be8);
+        box-shadow: 0 18px 32px rgba(20,140,203,.25), 0 5px 0 rgba(20,120,184,.15);
+        content: "✉";
+         font: 700 36px/1 var(--mono);
+         text-align: center;
+        transform: perspective(600px) rotateX(10deg) rotateY(-8deg);
+        animation: logo-float 4s ease-in-out infinite alternate;
+      }
+      @keyframes logo-float { to { transform: perspective(600px) rotateX(5deg) rotateY(8deg) translateY(-5px); } }
+      h1 { max-width: 620px; margin: 5px 0 0; color: var(--deep); font-size: 29px; line-height: 1.05; letter-spacing: -1.4px; }
+      .intro-copy { max-width: 280px; margin: 4px 0 0; color: #7e92a9; font-size: 11px; line-height: 1.6; }
+      .short-lived { display: none; }
+
+      .surface {
+        border: 1px solid var(--border);
+        background: var(--surface);
+        box-shadow: 0 8px 32px var(--shadow);
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+      }
+      .address-card { overflow: hidden; border-radius: 24px; transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease; transform: perspective(1000px) rotateX(1deg); transform-style: preserve-3d; }
+      .address-card:hover { transform: perspective(1000px) translateY(-4px) rotateX(4deg) rotateY(-1deg) scale(1.006); box-shadow: 0 18px 40px rgba(33,155,212,.22); }
+      .address-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 28px 24px 22px; }
+      .address-label { margin: 0 0 11px; color: #8790a3; font-size: 10px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; }
+      .address-value { display: flex; align-items: center; gap: 13px; min-width: 0; color: #35305d; font: 600 16px var(--mono); word-break: break-all; }
+      .address-icon, .panel-icon { display: grid; flex: 0 0 auto; width: 42px; height: 42px; place-items: center; border-radius: 13px; color: #6b58ba; background: rgba(232,226,255,.7); }
+      .address-icon svg, .panel-icon svg { width: 20px; height: 20px; }
+      .address-actions { display: flex; align-items: center; gap: 8px; }
+      .address-foot { display: flex; align-items: center; gap: 16px; min-height: 45px; padding: 0 24px; border-top: 1px solid rgba(135,144,163,.14); color: #8c95a7; font-size: 10px; }
+      .address-foot span { display: inline-flex; align-items: center; gap: 7px; }
+      .separator { width: 1px; height: 15px; background: rgba(135,144,163,.25); }
+
+      .error-banner { display: none; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 20px; padding: 13px 16px; border: 1px solid rgba(244,63,94,.3); border-radius: 15px; color: #925060; background: rgba(255,245,243,.82); font-size: 12px; }
+      .error-banner.visible { display: flex; }
+      .inbox-layout { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
+      .panel { min-height: 0; overflow: hidden; border-radius: 24px; background: rgba(255,255,255,.62); transform: perspective(1000px) rotateX(.7deg); transform-style: preserve-3d; }
+      .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 67px; padding: 0 20px; border-bottom: 1px solid rgba(135,144,163,.14); }
+      .panel-title { display: flex; align-items: center; gap: 11px; }
+      .panel-title .panel-icon { width: 34px; height: 34px; border-radius: 11px; color: #4da88b; background: rgba(220,247,238,.7); }
+      .panel-title h2 { margin: 0; font-size: 14px; letter-spacing: -.3px; }
+      .panel-title p { margin: 3px 0 0; color: #a1a8b5; font-size: 10px; }
+      .badge { display: none; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 7px; border-radius: 20px; color: white; font-size: 10px; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--danger)); animation: badge-pop .45s cubic-bezier(.34,1.56,.64,1); }
+      .badge.visible { display: inline-flex; }
+      @keyframes badge-pop { 0% { transform: scale(0); } 75% { transform: scale(1.3); } 100% { transform: scale(1); } }
+      .messages { padding: 8px; }
+      .message-item { position: relative; display: grid; grid-template-columns: 36px minmax(0,1fr) auto 34px; gap: 8px; align-items: center; width: 100%; padding: 12px 10px; border-radius: 14px; color: var(--text); cursor: pointer; user-select: none; -webkit-user-select: none; background: transparent; transition: transform .2s ease, background .2s ease; animation: message-in .45s both; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+      .message-item:hover, .message-item.selected { transform: translateX(5px); background: rgba(239,235,255,.63); }
+      .message-item::before { position: absolute; left: 0; width: 3px; height: 0; border-radius: 0 4px 4px 0; background: var(--accent); content: ""; transition: height .2s ease; }
+      .message-item:hover::before, .message-item.selected::before { height: 28px; }
+      @keyframes message-in { from { opacity: 0; transform: translateX(-18px); } to { opacity: 1; transform: translateX(0); } }
+      .sender-avatar { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 12px; color: #6f61aa; background: linear-gradient(135deg, #e4e7ff, #f0dcfa); font-size: 11px; font-weight: 800; }
+      .message-content { min-width: 0; }
+      .message-sender, .message-subject { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+      .message-sender { color: #41485c; font-size: 11px; font-weight: 700; }
+      .message-item.unread .message-sender { color: var(--deep); }
+      .message-subject { margin-top: 4px; color: #828b9c; font-size: 11px; }
+      .message-item.unread .message-subject { color: #596277; font-weight: 600; }
+      .message-meta { align-self: start; display: grid; justify-items: end; gap: 8px; color: #a3abb8; font-size: 10px; white-space: nowrap; }
+      .unread-dot { width: 7px; height: 7px; background: var(--accent); }
+      .delete-btn { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 0; border-radius: 9px; background: transparent; color: #c5cad5; cursor: pointer; padding: 0; font: inherit; flex-shrink: 0; -webkit-tap-highlight-color: transparent; touch-action: manipulation; transition: background .15s, color .15s; }
+      .delete-btn svg { width: 15px; height: 15px; pointer-events: none; display: block; }
+      .delete-btn:hover { background: rgba(244,63,94,.13); color: var(--danger); }
+      .delete-btn:active { background: rgba(244,63,94,.25); color: var(--danger); }
+      .empty-state { display: grid; min-height: 280px; place-items: center; padding: 34px 22px; text-align: center; }
+      .empty-icon { display: grid; width: 74px; height: 74px; margin: 0 auto 16px; place-items: center; border: 1px solid rgba(76,167,139,.2); border-radius: 50%; color: #4fa98d; background: rgba(227,248,240,.5); }
+      .empty-icon svg { width: 28px; height: 28px; }
+      .empty-state h3 { margin: 0; color: #4a4b6c; font-size: 14px; }
+      .empty-state p { max-width: 250px; margin: 8px auto 17px; color: #9da5b1; font-size: 11px; line-height: 1.65; }
+      .reader-panel { display: none; min-width: 0; perspective: 800px; }
+      .reader-panel.open { display: block; }
+      
+      .reader-panel.open .reader-inner { animation: reader-in .4s cubic-bezier(.25,.46,.45,.94); transform-origin: left center; }
+      @keyframes reader-in { from { opacity: 0; transform: rotateY(90deg); } to { opacity: 1; transform: rotateY(0); } }
+      .reader-content { min-height: 300px; padding: 24px; }
+      .reader-empty { min-height: 280px; }
+      .reader-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 22px; }
+      .reader-toolbar .button { min-height: 34px; }
+      .reader-subject { margin: 0 0 18px; color: var(--deep); font-size: 25px; line-height: 1.2; letter-spacing: -1px; }
+      .reader-meta { display: flex; align-items: center; gap: 12px; color: #8891a1; font-size: 11px; }
+      .reader-from { color: #515972; font-weight: 700; }
+      .reader-body { min-width: 0; margin-top: 24px; padding-top: 22px; border-top: 1px solid rgba(135,144,163,.15); color: #505b70; font-size: 13px; line-height: 1.75; overflow-wrap: anywhere; }
+      .reader-body pre { margin: 0; white-space: pre-wrap; font: 13px/1.75 var(--mono); }
+      .reader-body iframe { display: block; width: 100%; min-height: 420px; border: 0; border-radius: 14px; background: white; }
+      .reader-body img { max-width: 100%; height: auto; }
+      .reader-body table { max-width: 100%; }
+      .reader-error { color: #9b5d6a; }
+      .spinner { display: none; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.4); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite; }
+      .button.loading .spinner { display: block; }
+      .button.loading svg { display: none; }
+      .button:not(.primary) .spinner { border-color: rgba(33,155,212,.22); border-top-color: var(--accent); }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      .address-foot.live-pulse { color: #3da982; }
+      .address-foot.live-pulse .live-dot { background: #20b486; animation: live-pulse .7s ease-out; }
+      @keyframes live-pulse { 0% { box-shadow: 0 0 0 0 rgba(32,180,134,.55); } 100% { box-shadow: 0 0 0 9px rgba(32,180,134,0); } }
+      .toast { position: fixed; right: 28px; bottom: 28px; z-index: 10; display: flex; align-items: start; gap: 12px; max-width: 360px; padding: 15px 17px; border: 1px solid var(--border); border-radius: 16px; color: var(--text); background: rgba(255,255,255,.83); box-shadow: 0 18px 42px rgba(61,57,124,.2); backdrop-filter: blur(20px); transform: translateY(20px) rotateX(-15deg); opacity: 0; pointer-events: none; }
+      .toast.visible { animation: toast-in .35s forwards; pointer-events: auto; }
+      .toast.hide { animation: toast-out .3s forwards; }
+      .toast-icon { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 10px; color: #2f9f7b; background: rgba(216,247,236,.85); }
+      .toast.error .toast-icon { color: var(--danger); background: rgba(254,227,232,.85); }
+      .toast-icon svg { width: 16px; height: 16px; }
+      .toast-title { font-size: 12px; font-weight: 800; }
+      .toast-body { margin-top: 4px; color: #818a9b; font-size: 11px; line-height: 1.4; }
+      @keyframes toast-in { to { opacity: 1; transform: translateY(0) rotateX(0); } }
+      @keyframes toast-out { to { opacity: 0; transform: translateY(-10px) rotateX(15deg) scale(.95); } }
+      .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+      .mobile-only { display: none; }
+      @media (max-width: 760px) {
+        .page { padding: 8px; }
+        /* 3D transforms can create broken hit areas in mobile Safari/Chrome. */
+        .shell { min-height: calc(100vh - 16px); padding: 12px 11px 16px; border-radius: 30px; transform: none; transform-style: flat; }
+        .top-actions { gap: 10px; }
+        .private-note { display: none; }
+        .brand-mark { width: 43px; height: 43px; border-radius: 14px; }
+        .button.small { min-height: 33px; padding: 0 10px; }
+        .intro { padding: 20px 0 16px; gap: 5px; }
+        .intro::before { width: 66px; height: 66px; border-width: 4px; border-radius: 22px; }
+        h1 { font-size: 25px; letter-spacing: -1.3px; }
+        .intro-copy { font-size: 10px; }
+        .address-row { align-items: start; flex-direction: column; padding: 18px 15px 15px; gap: 15px; }
+        .address-value { gap: 10px; font-size: 14px; }
+        .address-icon { width: 36px; height: 36px; border-radius: 11px; }
+        .address-icon svg { width: 18px; height: 18px; }
+        .address-actions { width: 100%; }
+        .address-actions .button:first-child { flex: 1; }
+        .address-foot { min-height: 38px; padding: 0 17px; font-size: 9px; }
+        .inbox-layout { display: block; margin-top: 14px; }
+        .panel { min-height: 0; transform: none; transform-style: flat; }
+        .reader-panel { display: none; margin-top: 14px; }
+        
+        .panel-head { min-height: 59px; padding: 0 16px; }
+        .inbox-panel { min-height: 0; }
+        .empty-state { min-height: 230px; padding: 24px 18px; }
+        .empty-icon { width: 62px; height: 62px; margin-bottom: 12px; }
+        .empty-icon svg { width: 24px; height: 24px; }
+        .empty-state p { margin: 6px auto 13px; }
+        .reader-content { min-height: 260px; padding: 20px 16px; }
+        .reader-empty { min-height: 240px; }
+        .mobile-only { display: inline-flex; }
+        .message-item { grid-template-columns: 34px minmax(0,1fr) auto 30px; transform: none; }
+        .message-item:hover, .message-item.selected { transform: none; }
+        .delete-btn { position: relative; z-index: 2; touch-action: manipulation; }
+        .toast { right: 16px; bottom: 16px; left: 16px; max-width: none; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="blob blob-a"></div><div class="blob blob-b"></div><div class="blob blob-c"></div>
+      <main class="shell">
+        <header class="topbar">
+            <a class="brand" href="/" aria-label="Private inbox home">
+            <span class="brand-mark"><img src="https://hostx.primehost-px.workers.dev/img/9154389c-dc9d-4c35-aaff-1d38eab1de2f" alt="XN Temp Mail logo" /></span>
+            <span class="brand-copy"><span class="brand-name">XN Temp Mail</span><span class="brand-sub">Private inbox</span></span>
+          </a>
+          <div class="top-actions">
+            <button class="button small" id="new-email-top" type="button"><span data-icon="plus"></span> Regenerate<span class="spinner"></span></button>
+          </div>
+        </header>
+
+        <section class="intro">
+          <div>
+            <h1>Private inbox.</h1>
+            <p class="intro-copy">Ready when you are.</p>
+          </div>
+        </section>
+
+        <div class="error-banner" id="error-banner" role="alert"><span id="error-text"></span><button class="button small" id="retry-button" type="button">Try again</button></div>
+
+        <section class="surface address-card" aria-label="Temporary address">
+          <div class="address-row">
+            <div>
+            <p class="address-label">Temporary address</p>
+              <div class="address-value"><span class="address-icon" data-icon="mail"></span><span id="email-address">Creating an address…</span></div>
+            </div>
+            <div class="address-actions">
+              <button class="button" id="copy-button" type="button" disabled><span data-icon="copy"></span><span>Copy address</span></button>
+              <button class="button primary icon" id="refresh-button" type="button" aria-label="Regenerate email" title="Regenerate email" disabled><span data-icon="refresh"></span><span class="spinner"></span></button>
+            </div>
+          </div>
+          <div class="address-foot" id="live-status"><span><span class="live-dot"></span> Live inbox</span><span class="separator"></span><span>Auto refresh 30s</span></div>
+        </section>
+
+        <section class="inbox-layout">
+          <div class="surface panel inbox-panel">
+            <div class="panel-head">
+              <div class="panel-title"><span class="panel-icon" data-icon="inbox"></span><div><h2>Inbox</h2><p id="inbox-subtitle">Checking for messages</p></div></div>
+              <span class="badge" id="unread-badge">0</span>
+            </div>
+            <div class="messages" id="messages" aria-live="polite" aria-busy="false"></div>
+          </div>
+          <div class="surface panel reader-panel" id="reader-panel" aria-label="Message reader">
+            <div class="reader-inner" id="reader"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status"><span class="toast-icon" data-icon="check"></span><div><div class="toast-title" id="toast-title"></div><div class="toast-body" id="toast-body"></div></div></div>
+
+    <script>
+      (() => {
+        "use strict";
+         const API_ROOT = "https://api.guerrillamail.com/ajax.php";
+         const STORAGE = ["guerrilla-mail.email", "guerrilla-mail.token", "guerrilla-mail.accountId"];
+         const LEGACY_STORAGE = ["temp-mail.email", "temp-mail.password", "temp-mail.token", "temp-mail.accountId"];
+        const state = { session: null, messages: [], selected: null, booting: true, regenerating: false, refreshTimer: null, toastTimer: null };
+        const $ = (selector) => document.querySelector(selector);
+        const iconPaths = {
+          shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3 19 6v5c0 4.5-3 8.1-7 10-4-1.9-7-5.5-7-10V6l7-3Z"/><path d="m9 12 2 2 4-4"/></svg>',
+          plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>',
+          spark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 3 1.4 5.6L19 10l-5.6 1.4L12 17l-1.4-5.6L5 10l5.6-1.4L12 3Z"/><path d="m19 16 .6 2.4L22 19l-2.4.6L19 22l-.6-2.4L16 19l2.4-.6L19 16Z"/></svg>',
+          clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+          mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>',
+          copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="8" y="8" width="11" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2"/></svg>',
+          refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 11a8 8 0 0 0-14.8-4L3 10"/><path d="M3 5v5h5M4 13a8 8 0 0 0 14.8 4L21 14"/><path d="M21 19v-5h-5"/></svg>',
+          inbox: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 12h4l2 3h4l2-3h4"/><path d="M5 5h14l2 7v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6l2-7Z"/></svg>',
+          check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>',
+          back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m15 18-6-6 6-6"/></svg>',
+          arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+          open: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 12h4l2 3h4l2-3h4"/><path d="M5 5h14l2 7v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6l2-7Z"/><path d="M9 9h6"/></svg>',
+          trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>'
+        };
+        document.querySelectorAll("[data-icon]").forEach((node) => { const key = node.dataset.icon; if (iconPaths[key]) node.innerHTML = iconPaths[key]; });
+
+        const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+        const asBoolean = (value) => value === true || value === 1 || /^(true|1|yes|read)$/i.test(String(value ?? ""));
+        const normalizeMessage = (message = {}) => {
+          const sender = message.from || message.sender || {};
+          const from = typeof sender === "string" ? { name: sender, address: sender } : {
+            name: sender.name || sender.displayName || message.mail_from_name || "",
+            address: sender.address || sender.email || message.mail_from || ""
+          };
+          const body = typeof message.mail_body === "string" ? message.mail_body : "";
+          return {
+            ...message,
+            id: String(message.mail_id ?? message.id ?? ""),
+            from,
+            subject: message.subject ?? message.mail_subject ?? "",
+            createdAt: message.createdAt || (message.mail_timestamp ? new Date(Number(message.mail_timestamp) * 1000).toISOString() : new Date().toISOString()),
+            seen: asBoolean(message.seen ?? message.mail_read),
+            text: message.text ?? (!/<[a-z][\s\S]*>/i.test(body) ? body : (message.mail_excerpt || "")),
+            html: message.html ?? (/<[a-z][\s\S]*>/i.test(body) ? [body] : [])
+          };
+        };
+         const collection = (payload) => {
+           const values = Array.isArray(payload) ? payload : (payload && Array.isArray(payload.list) ? payload.list : (payload && Array.isArray(payload["hydra:member"]) ? payload["hydra:member"] : []));
+           return values.map(normalizeMessage).filter((message) => message.id);
+         };
+        const storedSession = () => {
+          try {
+            const values = STORAGE.map((key) => localStorage.getItem(key));
+             return values.every(Boolean) ? { email: values[0], token: values[1], accountId: values[2] } : null;
+          } catch (_) { return null; }
+        };
+        const saveSession = (session) => {
+           try { STORAGE.forEach((key, index) => localStorage.setItem(key, [session.email, session.token, session.accountId][index])); }
+          catch (_) { /* The inbox still works for this tab if storage is blocked. */ }
+        };
+        const clearSession = () => {
+           try { [...STORAGE, ...LEGACY_STORAGE].forEach((key) => localStorage.removeItem(key)); } catch (_) {}
+        };
+        async function api(path, options = {}, token) {
+          const headers = new Headers(options.headers || {});
+          if (options.body) headers.set("Content-Type", "application/json");
+           const separator = path.includes("?") ? "&" : "?";
+           const url = token ? `${API_ROOT}${path}${separator}sid_token=${encodeURIComponent(token)}` : `${API_ROOT}${path}`;
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 20000);
+          let response;
+           try { response = await fetch(url, { ...options, headers, signal: controller.signal }); }
+          catch (error) {
+            if (error.name === "AbortError") throw new Error("The request timed out. Please try again.");
+            throw error;
+          }
+          finally { clearTimeout(timeout); }
+          if (!response.ok) {
+            const error = new Error((await response.text().catch(() => "")) || `Request failed (${response.status})`);
+            error.status = response.status;
+            throw error;
+          }
+          if (response.status === 204) return null;
+          return response.json();
+        }
+        async function createAccount() {
+           const account = await api("?f=get_email_address");
+           if (!account?.email_addr || !account?.sid_token) throw new Error("The email service did not return an address.");
+           state.session = { email: account.email_addr, token: account.sid_token, accountId: account.alias || account.email_addr.split("@")[0] };
+          saveSession(state.session);
+          return state.session;
+        }
+         async function getInbox(token) {
+           const payload = await api("?f=get_email_list&offset=0", {}, token);
+           if (!payload || !Array.isArray(payload.list)) {
+             const error = new Error("This inbox session has expired.");
+             error.status = 401;
+             throw error;
+           }
+           return collection(payload);
+         }
+        const relativeTime = (value) => {
+          const date = new Date(value); const diff = Date.now() - date.getTime();
+          if (Number.isNaN(date.getTime()) || diff < 60000) return "just now";
+          if (diff < 3600000) return `${Math.max(1, Math.floor(diff / 60000))}m ago`;
+          if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+          if (diff < 604800000) return `${Math.floor(diff / 86400000)}d ago`;
+          return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+        };
+        const initials = (value) => (String(value || "Unknown").trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase() || "?");
+        const showError = (message) => { $("#error-text").textContent = message; $("#error-banner").classList.add("visible"); };
+        const clearError = () => $("#error-banner").classList.remove("visible");
+        const showToast = (title, body, kind = "success") => {
+          const toast = $("#toast"); clearTimeout(state.toastTimer);
+          toast.classList.remove("hide"); toast.classList.toggle("error", kind === "error");
+          $("#toast-title").textContent = title; $("#toast-body").textContent = body; toast.classList.add("visible");
+          state.toastTimer = setTimeout(() => { toast.classList.add("hide"); setTimeout(() => toast.classList.remove("visible"), 300); }, 4300);
+        };
+        const setRefreshLoading = (loading) => { $("#refresh-button").classList.toggle("loading", loading); $("#refresh-button").disabled = loading || !state.session; };
+        const setRegenerateLoading = (loading) => {
+          state.regenerating = loading;
+          ["#refresh-button", "#new-email-top"].forEach((selector) => {
+            const button = $(selector);
+            button.classList.toggle("loading", loading);
+            button.disabled = loading || !state.session;
+          });
+        };
+        const setAddress = (email) => { $("#email-address").textContent = email || "No address available"; $("#copy-button").disabled = !email; $("#refresh-button").disabled = !email; };
+        function renderMessages() {
+          const container = $("#messages");
+          const unread = state.messages.filter((message) => !message.seen).length;
+          $("#unread-badge").textContent = unread;
+          $("#unread-badge").classList.toggle("visible", unread > 0);
+          $("#inbox-subtitle").textContent = state.messages.length ? `${state.messages.length} ${state.messages.length === 1 ? "message" : "messages"}${unread ? ` · ${unread} unread` : ""}` : "Nothing waiting";
+          if (!state.messages.length) {
+             container.innerHTML = `<div class="empty-state"><div><div class="empty-icon">${iconPaths.inbox}</div><h3>Nothing here yet</h3><p>Messages sent to your address will settle here. You can leave this open.</p><button class="button small" id="check-again" type="button">${iconPaths.refresh}<span>Check again</span><span class="spinner"></span></button></div></div>`;
+             $("#check-again").addEventListener("click", async () => {
+               const button = $("#check-again");
+               button.classList.add("loading");
+               button.disabled = true;
+               await loadMessages(true);
+               if (button.isConnected) { button.classList.remove("loading"); button.disabled = false; }
+             });
+            return;
+          }
+          container.innerHTML = state.messages.map((message, index) => {
+            const sender = message.from?.name || message.from?.address || "Unknown sender";
+            const subject = message.subject || "(no subject)";
+            return `<div class="message-item ${message.seen ? "" : "unread"} ${state.selected === message.id ? "selected" : ""}" style="animation-delay:${index * 60}ms" data-id="${esc(message.id)}">
+              <span class="sender-avatar">${esc(initials(sender))}</span>
+              <span class="message-content"><span class="message-sender">${esc(sender)}</span><span class="message-subject">${esc(subject)}</span></span>
+              <span class="message-meta">${!message.seen ? '<span class="unread-dot"></span>' : ""}<span>${esc(relativeTime(message.createdAt))}</span></span>
+              <button class="delete-btn" data-del="${esc(message.id)}" type="button" aria-label="Delete">${iconPaths.trash}</button>
+            </div>`;
+          }).join("");
+        }
+        const renderReaderEmpty = (mobile = false) => {
+          $("#reader-panel").classList.toggle("open", false);
+          $("#reader").innerHTML = `<div class="empty-state reader-empty"><div><div class="empty-icon" style="color:#7566b7;background:rgba(232,226,255,.65);border-color:rgba(117,102,183,.18)">${iconPaths.mail}</div><h3>Choose a message</h3><p>Open something from the inbox to read it here without leaving your workspace.</p></div></div>`;
+        };
+        async function loadMessages(withToast = false) {
+          if (!state.session) return;
+          try {
+            const previousIds = new Set(state.messages.map((message) => message.id));
+             const next = await getInbox(state.session.token);
+            state.messages = next;
+             if (state.selected && !next.some((message) => message.id === state.selected)) {
+               state.selected = null;
+               renderReaderEmpty();
+             }
+            clearError(); renderMessages();
+            const liveStatus = $("#live-status");
+            liveStatus.classList.remove("live-pulse");
+            void liveStatus.offsetWidth;
+            liveStatus.classList.add("live-pulse");
+            setTimeout(() => liveStatus.classList.remove("live-pulse"), 800);
+            if (withToast) {
+              const fresh = next.filter((message) => !previousIds.has(message.id));
+              if (fresh.length) showToast(fresh.length === 1 ? "New message arrived" : `${fresh.length} new messages arrived`, fresh[0]?.subject || "Your inbox has changed.");
+            }
+          } catch (error) {
+            if (error.status === 401 || error.status === 403) {
+              clearSession(); state.session = null; state.selected = null; await bootstrap(true); return;
+            }
+             showError("The email service is taking a little longer than usual. Try again.");
+          }
+        }
+        async function bootstrap(forceNew = false) {
+          state.booting = true; clearError(); setAddress(""); $("#inbox-subtitle").textContent = "Checking for messages";
+          try {
+            if (!forceNew) state.session = storedSession();
+            if (state.session && !forceNew) {
+               state.messages = await getInbox(state.session.token);
+            } else {
+              state.session = await createAccount();
+              state.messages = await getInbox(state.session.token);
+            }
+            setAddress(state.session.email); renderMessages(); renderReaderEmpty(); clearError();
+          } catch (error) {
+            if (state.session && (error.status === 401 || error.status === 403) && !forceNew) {
+              clearSession(); state.session = null; return bootstrap(true);
+            }
+             showError("The email service is taking a little longer than usual. Try again.");
+            renderMessages(); renderReaderEmpty();
+          } finally {
+            state.booting = false;
+            if (!state.regenerating) setRefreshLoading(false);
+          }
+        }
+        const scrollToReader = () => requestAnimationFrame(() => $("#reader-panel").scrollIntoView({ behavior: "smooth", block: "start" }));
+        const renderReaderError = (id) => {
+          const panel = $("#reader-panel");
+          panel.classList.add("open");
+          $("#reader").innerHTML = `<div class="reader-content"><div class="reader-toolbar"><button class="button small mobile-only" id="reader-back" type="button">${iconPaths.back} Back to inbox</button></div><div class="empty-state reader-empty"><div><div class="empty-icon reader-error">${iconPaths.mail}</div><h3>Could not open this message</h3><p>The email may have expired or is temporarily unavailable.</p><button class="button small" id="retry-reader" type="button">${iconPaths.refresh} Try again</button></div></div></div>`;
+          $("#retry-reader").addEventListener("click", () => openMessage(id));
+          $("#reader-back").addEventListener("click", () => panel.classList.remove("open"));
+          scrollToReader();
+        };
+        async function openMessage(id) {
+          if (!id || !state.session) return;
+          state.selected = id; renderMessages();
+          const panel = $("#reader-panel");
+          panel.classList.add("open");
+          $("#reader").innerHTML = `<div class="empty-state reader-empty"><div><div class="spinner" style="display:block;border-color:rgba(91,124,250,.25);border-top-color:var(--accent);width:30px;height:30px;margin:auto"></div><p>Opening message…</p></div></div>`;
+          scrollToReader();
+          try {
+             let message;
+             try {
+               const messagePayload = await api(`?f=fetch_email&email_id=${encodeURIComponent(id)}`, {}, state.session.token);
+               if (!messagePayload?.mail_id) {
+                 const error = new Error("This inbox session has expired.");
+                 error.status = 401;
+                 throw error;
+               }
+               message = normalizeMessage(messagePayload);
+             } catch (error) {
+               const cached = state.messages.find((item) => item.id === id);
+               if (cached && (cached.text || cached.html?.length)) message = cached;
+               else throw error;
+             }
+            const target = state.messages.find((item) => item.id === id);
+            if (target) target.seen = true;
+            renderMessages();
+            $("#reader").innerHTML = `<div class="reader-content"><div class="reader-toolbar"><button class="button small mobile-only" id="reader-back" type="button">${iconPaths.back} Back to inbox</button></div><h2 class="reader-subject">${esc(message.subject || "(no subject)")}</h2><div class="reader-meta"><span class="sender-avatar">${esc(initials(message.from?.name || message.from?.address))}</span><span class="reader-from">${esc(message.from?.name || message.from?.address || "Unknown sender")}</span><span>·</span><span>${esc(relativeTime(message.createdAt))}</span></div><div class="reader-body" id="reader-body"></div></div>`;
+            const body = $("#reader-body");
+            const htmlCandidates = Array.isArray(message.html) ? message.html : [message.html];
+            const htmlContent = htmlCandidates.filter((value) => typeof value === "string" && value.trim()).pop();
+            const textContent = typeof message.text === "string" && message.text.trim() ? message.text : (message.intro || "");
+            if (htmlContent) {
+              const iframe = document.createElement("iframe");
+              iframe.setAttribute("sandbox", "allow-same-origin");
+              iframe.title = "Email content";
+              iframe.loading = "lazy";
+              iframe.referrerPolicy = "no-referrer";
+              iframe.srcdoc = sanitizeHtml(htmlContent);
+              body.appendChild(iframe);
+            } else if (textContent) {
+              const pre = document.createElement("pre");
+              pre.textContent = textContent;
+              body.appendChild(pre);
+            } else {
+              body.innerHTML = `<p>No readable content was included in this email.</p>`;
+            }
+            $("#reader-back").addEventListener("click", () => panel.classList.remove("open"));
+            scrollToReader();
+           } catch (error) {
+             if (error.status === 401 || error.status === 403) {
+               clearSession(); state.session = null; state.selected = null; await bootstrap(true); return;
+             }
+            showToast("Could not open message", "The message may have already expired.", "error");
+            renderReaderError(id);
+          }
+        }
+        function sanitizeHtml(html) {
+          const doc = new DOMParser().parseFromString(String(html || ""), "text/html");
+          doc.querySelectorAll("script, object, embed, form, base, meta[http-equiv]").forEach((node) => node.remove());
+          doc.querySelectorAll("*").forEach((node) => {
+             [...node.attributes].forEach((attribute) => {
+               const name = attribute.name.toLowerCase();
+               const value = attribute.value.trim();
+               if (name.startsWith("on") || ((name === "href" || name === "src") && /^javascript:/i.test(value))) node.removeAttribute(attribute.name);
+             });
+          });
+           doc.querySelectorAll("a[href]").forEach((link) => {
+             link.setAttribute("target", "_blank");
+             link.setAttribute("rel", "noopener noreferrer");
+           });
+          return `<!doctype html><html><head><style>body{font-family:Arial,sans-serif;color:#344054;line-height:1.6;padding:18px;margin:0;overflow-wrap:anywhere}img{max-width:100%;height:auto}</style></head><body>${doc.body.innerHTML}</body></html>`;
+        }
+        async function replaceInbox() {
+          if (state.booting || !state.session) return;
+          setRegenerateLoading(true);
+           try { clearSession(); state.session = null; state.messages = []; state.selected = null; renderMessages(); renderReaderEmpty(); await bootstrap(true); showToast("New inbox ready", "Your previous address will expire separately."); }
+          catch (_) { showToast("Could not create a new inbox", "Please try again.", "error"); }
+          finally { setRegenerateLoading(false); }
+        }
+        const copyText = async (value) => {
+          if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(value);
+          const input = document.createElement("textarea");
+          input.value = value; input.setAttribute("readonly", ""); input.style.position = "fixed"; input.style.opacity = "0";
+          document.body.appendChild(input); input.select();
+          const copied = document.execCommand("copy");
+          input.remove();
+          if (!copied) throw new Error("Copy failed");
+        };
+        $("#copy-button").addEventListener("click", async () => {
+          if (!state.session) return;
+          try { await copyText(state.session.email); $("#copy-button").querySelector("span:last-child").textContent = "Copied!"; setTimeout(() => $("#copy-button").querySelector("span:last-child").textContent = "Copy address", 2000); }
+          catch (_) { showToast("Copy unavailable", "Select the address and copy it manually.", "error"); }
+        });
+        $("#refresh-button").addEventListener("click", () => replaceInbox());
+        $("#retry-button").addEventListener("click", () => bootstrap());
+        $("#new-email-top").addEventListener("click", () => replaceInbox());
+        document.addEventListener("keydown", (event) => { if (event.key === "Escape") { $("#reader-panel").classList.remove("open"); } });
+        state.refreshTimer = setInterval(() => { if (!document.hidden && state.session) loadMessages(true); }, 30000);
+        // Global event delegation — একবারই set হয়, সব click এখানে আসে
+        $("#messages").addEventListener("click", (e) => {
+          const del = e.target.closest("[data-del]");
+          if (del) { e.stopPropagation(); deleteMessage(del.dataset.del); return; }
+          const item = e.target.closest("[data-id]");
+          if (item) openMessage(item.dataset.id);
+        });
+
+        async function deleteMessage(id) {
+          if (!id || !state.session) return;
+          const backup = [...state.messages];
+          state.messages = state.messages.filter(m => m.id !== id);
+          if (state.selected === id) { state.selected = null; $("#reader-panel").classList.remove("open"); }
+          renderMessages();
+          try {
+            await api(`?f=del_email&email_ids%5B%5D=${encodeURIComponent(id)}`, {}, state.session.token);
+            showToast("Message deleted", "Removed from your inbox.");
+          } catch(_) {
+            state.messages = backup; renderMessages();
+            showToast("Could not delete", "Please try again.", "error");
+          }
+        }
+
+        renderMessages(); renderReaderEmpty(); bootstrap();
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>CB ROUND NUMBER GLITCH | Instant Setup Bookmarklet</title>
+<link rel="icon" type="image/png" href="logo.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@600;700;800&display=swap"/>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  background-color:#070b14;
+  background-image:
+    radial-gradient(circle 900px at 50% -100px, rgba(14, 165, 233, 0.15), transparent 75%),
+    linear-gradient(to right, rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+  background-size:100% 100%, 34px 34px, 34px 34px;
+  color:#f1f5f9;
+  font-family:"Hind Siliguri",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{
+  max-width:800px;
+  margin:0 auto;
+  padding:44px 20px 60px;
+}
+header{
+  text-align:center;
+}
+.logo-container{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  margin-bottom:6px;
+}
+.logo-glow{
+  position:absolute;
+  inset:-8px;
+  border-radius:26px;
+  background:radial-gradient(circle, rgba(14,165,233,0.3) 0%, transparent 70%);
+  filter:blur(14px);
+  z-index:0;
+}
+.logo{
+  position:relative;
+  z-index:1;
+  width:96px;
+  height:96px;
+  border-radius:20px;
+  object-fit:contain;
+  background:#0b1120;
+  border:1.5px solid rgba(56,189,248,0.35);
+  box-shadow:0 12px 36px -8px rgba(0,0,0,0.8), inset 0 0 16px rgba(56,189,248,0.08);
+  padding:8px;
+}
+.kicker{
+  margin:16px 0 0;
+  font-size:11.5px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:#38bdf8;
+  font-weight:700;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(15,23,42,0.8);
+  border:1.5px solid rgba(56,189,248,0.25);
+  padding:4px 14px;
+  border-radius:999px;
+  box-shadow:0 4px 16px rgba(0,0,0,0.4);
+}
+.pulse-dot{
+  width:7px;
+  height:7px;
+  background:#10b981;
+  border-radius:50%;
+  box-shadow:0 0 8px #10b981;
+  display:inline-block;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:.4;transform:scale(.85)}
+}
+h1{
+  font-family:Sora,sans-serif;
+  font-weight:800;
+  font-size:36px;
+  margin:14px 0 0;
+  letter-spacing:-.02em;
+  color:#ffffff;
+  line-height:1.2;
+}
+h1 span{
+  color:#38bdf8;
+  text-shadow:0 0 25px rgba(56,189,248,0.45);
+}
+.sub{
+  color:#94a3b8;
+  margin:10px auto 0;
+  font-size:15.5px;
+  max-width:520px;
+  line-height:1.6;
+}
+
+/* Card with prominent border */
+.card{
+  margin-top:34px;
+  background:#0c1220;
+  border:1.5px solid rgba(56,189,248,0.25);
+  border-radius:18px;
+  padding:22px;
+  box-shadow:0 20px 50px -10px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.cardhead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:12px;
+}
+.label{
+  font-size:12.5px;
+  color:#38bdf8;
+  font-weight:700;
+  letter-spacing:.06em;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  text-transform:uppercase;
+}
+.label svg{width:16px;height:16px;stroke:#38bdf8}
+.dots{display:flex;gap:6px}
+.dots i{
+  display:inline-block;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+}
+pre{
+  max-height:150px;
+  overflow:auto;
+  white-space:pre-wrap;
+  word-break:break-all;
+  background:#040711;
+  border:1.5px solid rgba(56,189,248,0.18);
+  border-radius:12px;
+  padding:15px;
+  font-family:"JetBrains Mono",ui-monospace,monospace;
+  font-size:12px;
+  line-height:1.7;
+  color:#93c5fd;
+  margin:0;
+  transition:border-color .2s;
+}
+pre:hover{border-color:rgba(56,189,248,0.4)}
+pre::-webkit-scrollbar{width:6px;height:6px}
+pre::-webkit-scrollbar-thumb{background:rgba(56,189,248,0.25);border-radius:3px}
+pre::-webkit-scrollbar-thumb:hover{background:rgba(56,189,248,0.45)}
+.row{
+  display:flex;
+  margin-top:16px;
+}
+.btn{
+  width:100%;
+  border:1.5px solid rgba(56,189,248,0.45);
+  border-radius:12px;
+  padding:15px 24px;
+  font:700 16px "Hind Siliguri",sans-serif;
+  cursor:pointer;
+  text-align:center;
+  text-decoration:none;
+  transition:all .2s ease;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+}
+.btn svg{width:18px;height:18px;transition:transform .2s}
+.btn:hover{
+  transform:translateY(-2px);
+}
+.btn:active{transform:translateY(0)}
+.primary{
+  background:linear-gradient(135deg, #0284c7 0%, #0369a1 50%, #0ea5e9 100%);
+  color:#fff;
+  box-shadow:0 12px 30px -8px rgba(14,165,233,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.primary:hover{
+  background:linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+  box-shadow:0 16px 36px -6px rgba(14,165,233,0.7);
+  border-color:rgba(56,189,248,0.7);
+}
+.ok{
+  background:linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+  color:#fff !important;
+  border-color:rgba(16,185,129,0.6) !important;
+  box-shadow:0 12px 30px -8px rgba(16,185,129,0.55) !important;
+}
+
+h2{
+  font-family:Sora,sans-serif;
+  font-size:21px;
+  margin:42px 0 0;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:#ffffff;
+}
+h2 span{color:#38bdf8}
+ol{
+  list-style:none;
+  padding:0;
+  margin:18px 0 0;
+  display:grid;
+  gap:14px;
+  grid-template-columns:1fr 1fr;
+}
+li{
+  background:#0c1220;
+  border:1.5px solid rgba(56,189,248,0.2);
+  border-radius:16px;
+  padding:20px;
+  transition:all .25s ease;
+  box-shadow:0 10px 25px -5px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+li:hover{
+  border-color:rgba(56,189,248,0.5);
+  transform:translateY(-3px);
+  box-shadow:0 16px 36px -8px rgba(0,0,0,0.7), 0 0 20px rgba(56,189,248,0.12);
+}
+.num{
+  font-family:Sora,sans-serif;
+  font-weight:800;
+  font-size:25px;
+  color:#38bdf8;
+  display:inline-block;
+  letter-spacing:-.02em;
+}
+li h3{
+  margin:8px 0 0;
+  font-size:16.5px;
+  color:#ffffff;
+  font-weight:600;
+}
+li p{
+  margin:6px 0 0;
+  font-size:13.5px;
+  line-height:1.7;
+  color:#94a3b8;
+}
+li code{
+  background:rgba(56,189,248,0.12);
+  color:#38bdf8;
+  padding:2px 6px;
+  border-radius:6px;
+  font-size:12px;
+  font-family:"JetBrains Mono",monospace;
+  border:1px solid rgba(56,189,248,0.22);
+}
+li b{color:#f1f5f9}
+
+.tip{
+  margin-top:20px;
+  background:#0a101d;
+  border:1.5px solid rgba(56,189,248,0.28);
+  border-radius:14px;
+  padding:16px 20px;
+  font-size:13.5px;
+  line-height:1.7;
+  color:#cbd5e1;
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  box-shadow:0 10px 25px -5px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.tip-icon{
+  flex-shrink:0;
+  width:20px;
+  height:20px;
+  color:#38bdf8;
+  margin-top:2px;
+}
+.tip b{color:#38bdf8}
+.tip code{
+  background:rgba(56,189,248,0.14);
+  color:#7dd3fc;
+  padding:2px 6px;
+  border-radius:6px;
+  font-size:12px;
+  font-family:"JetBrains Mono",monospace;
+  border:1px solid rgba(56,189,248,0.2);
+}
+
+footer{
+  margin-top:52px;
+  text-align:center;
+  font-size:12.5px;
+  color:#64748b;
+  border-top:1px solid rgba(255,255,255,0.06);
+  padding-top:22px;
+}
+@media(max-width:640px){
+  ol{grid-template-columns:1fr}
+  h1{font-size:28px}
+  .wrap{padding:28px 16px 44px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="logo-container">
+    <div class="logo-glow"></div>
+    <img class="logo" src="logo.png" alt="CB TRADERS BD"/>
+  </div>
+  <br/>
+  <span class="kicker"><span class="pulse-dot"></span> CB TRADERS BD · OFFICIAL</span>
+  <h1>CB ROUND NUMBER <span>GLITCH</span></h1>
+  <p class="sub">এক ক্লিকে Round Number Tracker চালু করুন। নিচের সহজ নির্দেশনা অনুসরণ করুন।</p>
+</header>
+
+<section class="card">
+  <div class="cardhead">
+    <span class="label">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"/></svg>
+      বুকমার্ক কোড (BOOKMARKLET CODE)
+    </span>
+    <span class="dots">
+      <i style="background:#ef4444"></i>
+      <i style="background:#f59e0b"></i>
+      <i style="background:#10b981"></i>
+    </span>
+  </div>
+  <pre id="code">javascript:(function(){if(window.__CB_ROUND_ACTIVATED__){const r=document.getElementById('cb-traders-root');if(r)r.style.display=(r.style.display==='none'?'block':'none');return;}const u='https://cb-round-number-tracker.vercel.app/api/engine?t='+Date.now();const s=document.createElement('script');s.src=u;s.onerror=function(){fetch(u).then(function(r){return r.text();}).then(function(c){(new Function(c))();}).catch(function(){alert('CB Terminal: Connection failed. Check internet.');});};(document.head||document.documentElement).appendChild(s);})();</pre>
+  <div class="row">
+    <button class="btn primary" id="cp">
+      <svg id="cp-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"/></svg>
+      <span id="cp-txt">কোড কপি করুন</span>
+    </button>
+  </div>
+</section>
+
+<section>
+  <h2><span>#</span> সেটআপ নির্দেশনা</h2>
+  <ol>
+    <li>
+      <span class="num">01</span>
+      <h3>কোড কপি করুন</h3>
+      <p>উপরের <b>“কোড কপি করুন”</b> বাটনে ক্লিক করে বুকমার্ক কোডটি ক্লিপবোর্ডে কপি করুন।</p>
+    </li>
+    <li>
+      <span class="num">02</span>
+      <h3>নতুন বুকমার্ক বানান</h3>
+      <p>ব্রাউজারে <code>Ctrl + Shift + O</code> (Mac এ <code>⌘ + Shift + O</code>) চাপুন, অথবা বুকমার্ক বারে রাইট-ক্লিক করে <b>“Add page”</b> বেছে নিন।</p>
+    </li>
+    <li>
+      <span class="num">03</span>
+      <h3>নাম ও URL দিন</h3>
+      <p>Name বক্সে <b>CB ROUND NUMBER GLITCH</b> লিখুন এবং URL বক্সে কপি করা কোডটি পেস্ট করে <b>Save</b> করুন।</p>
+    </li>
+    <li>
+      <span class="num">04</span>
+      <h3>চার্টে চালু করুন</h3>
+      <p>ট্রেডিং প্ল্যাটফর্ম (Quotex বা Pocket Option) খুলে সেভ করা বুকমার্কে ক্লিক করুন। সাথে সাথে ট্র্যাকার প্যানেল চালু হবে।</p>
+    </li>
+  </ol>
+
+  <div class="tip">
+    <svg class="tip-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.002 6.002 0 00-4-5.659V5.25a2.25 2.25 0 014.5 0v1.841A6.002 6.002 0 0012 12.75zm0 0v.008H12v-.008zM12 3a9 9 0 100 18 9 9 0 000-18z"/></svg>
+    <div>
+      <b>প্রো টিপ:</b> ব্রাউজারে বুকমার্ক বার দেখা না গেলে <code>Ctrl + Shift + B</code> (Mac এ <code>⌘ + Shift + B</code>) চাপুন। মোবাইলে যেকোনো পেজ বুকমার্ক করে তার URL এডিট করে কোডটি পেস্ট করলেই অনায়াসে কাজ করবে।
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 CB TRADERS BD · Official Premium Trading Tools</footer>
+</div>
+
+<script>
+var CODE = document.getElementById('code').textContent.trim();
+var cpBtn = document.getElementById('cp');
+var cpTxt = document.getElementById('cp-txt');
+var cpIcon = document.getElementById('cp-icon');
+
+cpBtn.addEventListener('click', function(){
+  function done(){
+    cpTxt.textContent = '✓ কোড কপি হয়েছে!';
+    cpBtn.className = 'btn ok';
+    setTimeout(function(){
+      cpTxt.textContent = 'কোড কপি করুন';
+      cpBtn.className = 'btn primary';
+    }, 2500);
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(CODE).then(done).catch(function(){ fb(); });
+  } else {
+    fb();
+  }
+
+  function fb(){
+    var t = document.createElement('textarea');
+    t.value = CODE;
+    t.setAttribute('readonly', '');
+    t.style.position = 'absolute';
+    t.style.left = '-9999px';
+    document.body.appendChild(t);
+    t.select();
+    try {
+      document.execCommand('copy');
+      done();
+    } catch(e) {
+      alert('কোড কপি করতে ব্যর্থ হয়েছে। দয়া করে ম্যানুয়ালি কপি করুন।');
+    }
+    document.body.removeChild(t);
+  }
+});
+</script>
+</body>
+</html>
